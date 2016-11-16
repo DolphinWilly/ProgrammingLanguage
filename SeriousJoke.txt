@@ -1,0 +1,1 @@
+1. Basically, with the untyped λ-calculus, it is garbage in, garbage out
