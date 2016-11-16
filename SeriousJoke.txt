@@ -1,1 +1,22 @@
 1. Basically, with the untyped λ-calculus, it is garbage in, garbage out
+2. The absence of confluence in concurrent imperative languages is one reason
+   that concurrent programming is difficult
+3. Hey, here is the joke: we find a fixed point operator: the infamous Y;
+   we want to find a fixed point for an operator T
+   feeling: Tf is more close to "the fixed point" then f;
+   seems T is very close to the fixed point and we know the closer a function
+   is to the fixed point, the closer T composed the function is to the fixed point;
+   what about applying T to T?
+   send in the format of composing a function to itself to T:
+   T' = λf . T (ff)
+   then T'T' = T(T'T')
+   OMG!!! T'T' is the fixed point of T
+   how to get the fixed point of T?
+   you get (λf . T (ff)) ( λf . T (ff) )
+   so to apply "the get-fixed-point function" to T
+   we use the trick of η-reduction (e and λx. e x, where x ̸∈ FV(e).
+   If these two terms are both applied to an argument e',
+   then they will both reduce to e e')
+   we consider (λf . T (ff)) ( λf . T (ff) ) as "e e'" and T as "e'"
+   so we get λt.(λf . t(ff)) (λf . t(ff)) which is the "e", that is the fixed-point
+   operator to be applied on T
