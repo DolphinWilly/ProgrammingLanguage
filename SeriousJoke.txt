@@ -19,4 +19,4 @@
    then they will both reduce to e e')
    we consider (λf . T (ff)) ( λf . T (ff) ) as "e e'" and T as "e'"
    so we get λt.(λf . t(ff)) (λf . t(ff)) which is the "e", that is the fixed-point
-   operator to be applied on T
+   combinator to be applied on T
