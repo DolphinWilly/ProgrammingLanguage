@@ -19,7 +19,13 @@ let is_closed (e : expr) : bool = HashSet.size (fv e) = 0
    a sugar-free expression of type `expr`. Functions with zero arguments are
    not allowed; you can just throw an error if one is provided. *)
 let rec translate (e : expr_s) : expr =
-  failwith "This is part (a)!"
+  match e with
+  | Var_s x -> Var x
+  | Fun_s ([],e_s) -> failwith "empty arguments"
+  | Fun_s ([x],e_s) -> Fun (x, translate e_s)
+  | Fun_s (h::t,e_s) -> Fun (h,translate (Fun_s (t, e_s)))
+  | Let_s (x,e1_s,e2_s) -> APP (Fun (x,translate e2_s), translate e1_s)
+  | App_s (e1_s, e2_s) -> APP (translate e1_s, translate e2_s)
 
 (* Substitute `v` for `x` in `e`, avoiding capture. *)
 let rec subst (e : expr) (v : expr) (x : id) : expr =
