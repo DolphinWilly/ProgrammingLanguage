@@ -24,14 +24,25 @@ let rec translate (e : expr_s) : expr =
   | Fun_s ([],e_s) -> failwith "empty arguments"
   | Fun_s ([x],e_s) -> Fun (x, translate e_s)
   | Fun_s (h::t,e_s) -> Fun (h,translate (Fun_s (t, e_s)))
-  | Let_s (x,e1_s,e2_s) -> APP (Fun (x,translate e2_s), translate e1_s)
-  | App_s (e1_s, e2_s) -> APP (translate e1_s, translate e2_s)
+  | Let_s (x,e1_s,e2_s) -> App (Fun (x,translate e2_s), translate e1_s)
+  | App_s (e1_s, e2_s) -> App (translate e1_s, translate e2_s)
 
 (* Substitute `v` for `x` in `e`, avoiding capture. *)
 let rec subst (e : expr) (v : expr) (x : id) : expr =
-  failwith "This is part (b)!"
+  match e with
+  | Var y -> if y = x then v else e
+  | App(e1,e2) -> App ((subst e1 v x),(subst e2 v x))
+  | Fun (y,e') -> if y = x then e
+                  else if not (HashSet.mem (fv v) y) then Fun (y,subst e' v x)
+                  else let z = fresh (App (App (e',v), App (Var x,Var y)))in
+                    Fun (z,subst (subst e' (Var z) y) v x)
 
 (* Apply one call-by-value beta-reduction step to `e`. If `e` cannot be
  * reduced under CBV, the function can throw an error. *)
 let rec cbv_step (e : expr) : expr =
-  failwith "This is part (c)!"
+  match e with
+  | Var x -> failwith ("Unbound variable" ^ x)
+  | Fun _ -> failwith "Cannot step under CBV, already a value"
+  | App (Fun (x,e1), (Fun _ as e2)) -> subst e1 e2 x
+  | App (Fun (x,e1), e2) -> App (Fun (x,e1), cbv_step e2)
+  | App (e1, e2) -> App (cbv_step e1, e2)
