@@ -41,7 +41,7 @@ let rec subst (e : expr) (v : expr) (x : id) : expr =
  * reduced under CBV, the function can throw an error. *)
 let rec cbv_step (e : expr) : expr =
   match e with
-  | Var x -> failwith ("Unbound variable" ^ x)
+  | Var x -> failwith ("Unbound variable " ^ x)
   | Fun _ -> failwith "Cannot step under CBV, already a value"
   | App (Fun (x,e1), (Fun _ as e2)) -> subst e1 e2 x
   | App (Fun (x,e1), e2) -> App (Fun (x,e1), cbv_step e2)

@@ -1,0 +1,15 @@
+(***Test File***DolphinWilly Ultimate Test***)
+(*1*)  let a = fun x y -> x y in
+let b = fun z w -> z w in
+let c = fun d -> d in
+let e = b c in
+a e
+
+(***result for 1***)
+(fun a -> (fun b -> (fun c -> (fun e -> a e) (b c)) (fun d -> d)) (fun z -> (fun w -> z w))) fun x -> fun y -> x y
+(fun b -> (fun c -> (fun e -> (fun x -> (fun y -> x y)) e) (b c)) (fun d -> d)) fun z -> fun w -> z w
+(fun c -> (fun e -> (fun x -> (fun y -> x y)) e) ((fun z -> (fun w -> z w)) c)) fun d -> d
+(fun e -> (fun x -> (fun y -> x y)) e) ((fun z -> (fun w -> z w)) fun d -> d)
+(fun e -> (fun x -> (fun y -> x y)) e) fun w -> (fun d -> d) w
+(fun x -> (fun y -> x y)) fun w -> (fun d -> d) w
+Result: fun y -> (fun w -> (fun d -> d) w) y
