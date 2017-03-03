@@ -7,12 +7,55 @@ open State
 
 (* Evaluate an arithmetic expression in a state. *)
 let rec eval_a (a : aexp) (s : state) : int =
-  failwith "Implement me!"
-
+  match a with
+  | Var(x) -> lookup s x
+  | Number(n) -> n
+  | Plus(a1,a2) -> eval_a a1 s + eval_a a2 s
+  | Minus(a1,a2) -> eval_a a1 s - eval_a a2 s
+  | Times(a1,a2) -> eval_a a1 s * eval_a a2 s
+  | Div(a1,a2) ->
+     if eval_a a2 s = 0 then begin
+         print_string  "Divide by zero error"; exit 1; 
+       end
+     else
+       eval_a a1 s / eval_a a2 s
+  | Mod(a1,a2) ->
+     if eval_a a2 s = 0 then begin
+        print_string "Mod zero error"; exit 1;
+       end
+     else
+       eval_a a1 s mod eval_a a2 s
+  | Input -> read_int()
+  
+     
+           
 (* Evaluate a Boolean expression in a state. *)
 let rec eval_b (b : bexp) (s : state) : bool =
-  failwith "Implement me!"
+  match b with
+  | Eq(a1,a2) -> eval_a a1 s = eval_a a2 s
+  | Leq(a1,a2) -> eval_a a1 s <= eval_a a2 s
+  | Lt(a1,a2) -> eval_a a1 s < eval_a a2 s
+  | Not(b) -> not(eval_b b s)
+  | And(b1,b2) -> eval_b b1 s && eval_b b2 s
+  | Or(b1,b2) -> eval_b b1 s || eval_b b2 s
+  | True -> true
+  | False -> false
 
 (* Evaluate a command in a state. *)
 let rec eval_c (c : com) (s : state) : state =
-  failwith "Implement me!"
+  match c with
+  | While(b,c) -> if eval_b b s then eval_c (Comp(c, While(b,c))) s else eval_c Skip s
+  | For (a,c) ->
+     if eval_b (Leq(a,Number(0))) s then eval_c Skip s else eval_c (Comp(c, For((Minus(a,Number(1))),c))) s
+  | Cond (b,c1,c2) -> if eval_b b s then eval_c c1 s else eval_c c2 s
+  | Comp (c1,c2) -> eval_c c2 (eval_c c1 s)
+  | Assg (x,a) ->
+     let n = eval_a a s in
+     rebind s x n
+  | Print (a) ->
+     let value = eval_a a s in begin
+         Printf.printf "%d\n" value;
+         s
+         end
+  | Skip -> s
+                     
