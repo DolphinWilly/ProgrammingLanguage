@@ -15,7 +15,7 @@ let rec eval_a (a : aexp) (s : state) : int =
   | Times(a1,a2) -> eval_a a1 s * eval_a a2 s
   | Div(a1,a2) ->
      if eval_a a2 s = 0 then begin
-         print_string  "Divide by zero error"; exit 1; 
+         print_string  "Divide by zero error"; exit 1;
        end
      else
        eval_a a1 s / eval_a a2 s
@@ -26,9 +26,9 @@ let rec eval_a (a : aexp) (s : state) : int =
      else
        eval_a a1 s mod eval_a a2 s
   | Input -> read_int()
-  
-     
-           
+
+
+
 (* Evaluate a Boolean expression in a state. *)
 let rec eval_b (b : bexp) (s : state) : bool =
   match b with
@@ -45,8 +45,9 @@ let rec eval_b (b : bexp) (s : state) : bool =
 let rec eval_c (c : com) (s : state) : state =
   match c with
   | While(b,c) -> if eval_b b s then eval_c (Comp(c, While(b,c))) s else eval_c Skip s
-  | For (a,c) ->
-     if eval_b (Leq(a,Number(0))) s then eval_c Skip s else eval_c (Comp(c, For((Minus(a,Number(1))),c))) s
+  | For (a,c) -> let n =  eval_a a s in
+                  if n <= 0 then s
+                  else eval_c (Comp (c, For (Number (n - 1), c))) s
   | Cond (b,c1,c2) -> if eval_b b s then eval_c c1 s else eval_c c2 s
   | Comp (c1,c2) -> eval_c c2 (eval_c c1 s)
   | Assg (x,a) ->
@@ -58,4 +59,3 @@ let rec eval_c (c : com) (s : state) : state =
          s
          end
   | Skip -> s
-                     
