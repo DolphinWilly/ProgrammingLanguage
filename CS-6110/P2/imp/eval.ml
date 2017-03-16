@@ -25,7 +25,7 @@ let rec eval_a (a : aexp) (s : state) : int =
        end
      else
        eval_a a1 s mod eval_a a2 s
-  | Input -> read_int()
+  | Input -> print_string "? "; read_int()
 
 
 
