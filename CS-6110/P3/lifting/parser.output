@@ -1,0 +1,1375 @@
+   0  $accept : %entry% $end
+
+   1  main : exp EOF
+
+   2  exp : FUN var_list IMP exp
+   3      | IF exp THEN exp ELSE exp
+   4      | LET var_list EQ exp IN exp
+   5      | LET REC var_list EQ exp IN exp
+   6      | compare_exp
+
+   7  var_list : VAR
+   8           | VAR var_list
+
+   9  compare_exp : infix_exp EQ infix_exp
+  10              | infix_exp LEQ infix_exp
+  11              | infix_exp LT infix_exp
+  12              | infix_exp GEQ infix_exp
+  13              | infix_exp GT infix_exp
+  14              | infix_exp
+
+  15  infix_exp : plus_minus_exp
+  16            | times_div_mod_exp
+  17            | and_exp
+  18            | or_exp
+  19            | app_exp
+
+  20  plus_minus_exp : plus_minus_exp PLUS app_exp
+  21                 | plus_minus_exp MINUS app_exp
+  22                 | app_exp PLUS app_exp
+  23                 | app_exp MINUS app_exp
+
+  24  times_div_mod_exp : times_div_mod_exp TIMES app_exp
+  25                    | times_div_mod_exp DIV app_exp
+  26                    | times_div_mod_exp MOD app_exp
+  27                    | app_exp TIMES app_exp
+  28                    | app_exp DIV app_exp
+  29                    | app_exp MOD app_exp
+
+  30  and_exp : and_exp AND app_exp
+  31          | app_exp AND app_exp
+
+  32  or_exp : or_exp OR app_exp
+  33         | app_exp OR app_exp
+
+  34  app_exp : app_exp atomic_exp
+  35          | atomic_exp
+
+  36  atomic_exp : VAR
+  37             | NUM
+  38             | TRUE
+  39             | FALSE
+  40             | NOT atomic_exp
+  41             | LPAREN exp RPAREN
+
+  42  %entry% : '\001' main
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	.  error
+
+	%entry%  goto 2
+
+
+state 1
+	%entry% : '\001' . main  (42)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	main  goto 12
+	exp  goto 13
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 2
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 3
+	exp : FUN . var_list IMP exp  (2)
+
+	VAR  shift 22
+	.  error
+
+	var_list  goto 23
+
+
+state 4
+	exp : LET . var_list EQ exp IN exp  (4)
+	exp : LET . REC var_list EQ exp IN exp  (5)
+
+	REC  shift 24
+	VAR  shift 22
+	.  error
+
+	var_list  goto 25
+
+
+state 5
+	atomic_exp : VAR .  (36)
+
+	.  reduce 36
+
+
+state 6
+	atomic_exp : LPAREN . exp RPAREN  (41)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 26
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 7
+	atomic_exp : TRUE .  (38)
+
+	.  reduce 38
+
+
+state 8
+	atomic_exp : FALSE .  (39)
+
+	.  reduce 39
+
+
+state 9
+	atomic_exp : NOT . atomic_exp  (40)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	atomic_exp  goto 27
+
+
+state 10
+	exp : IF . exp THEN exp ELSE exp  (3)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 28
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 11
+	atomic_exp : NUM .  (37)
+
+	.  reduce 37
+
+
+state 12
+	%entry% : '\001' main .  (42)
+
+	.  reduce 42
+
+
+state 13
+	main : exp . EOF  (1)
+
+	EOF  shift 29
+	.  error
+
+
+state 14
+	exp : compare_exp .  (6)
+
+	.  reduce 6
+
+
+state 15
+	compare_exp : infix_exp . EQ infix_exp  (9)
+	compare_exp : infix_exp . LEQ infix_exp  (10)
+	compare_exp : infix_exp . LT infix_exp  (11)
+	compare_exp : infix_exp . GEQ infix_exp  (12)
+	compare_exp : infix_exp . GT infix_exp  (13)
+	compare_exp : infix_exp .  (14)
+
+	EQ  shift 30
+	LEQ  shift 31
+	LT  shift 32
+	GEQ  shift 33
+	GT  shift 34
+	IN  reduce 14
+	RPAREN  reduce 14
+	THEN  reduce 14
+	ELSE  reduce 14
+	EOF  reduce 14
+
+
+state 16
+	infix_exp : plus_minus_exp .  (15)
+	plus_minus_exp : plus_minus_exp . PLUS app_exp  (20)
+	plus_minus_exp : plus_minus_exp . MINUS app_exp  (21)
+
+	PLUS  shift 35
+	MINUS  shift 36
+	IN  reduce 15
+	RPAREN  reduce 15
+	EQ  reduce 15
+	LEQ  reduce 15
+	LT  reduce 15
+	GEQ  reduce 15
+	GT  reduce 15
+	THEN  reduce 15
+	ELSE  reduce 15
+	EOF  reduce 15
+
+
+state 17
+	infix_exp : times_div_mod_exp .  (16)
+	times_div_mod_exp : times_div_mod_exp . TIMES app_exp  (24)
+	times_div_mod_exp : times_div_mod_exp . DIV app_exp  (25)
+	times_div_mod_exp : times_div_mod_exp . MOD app_exp  (26)
+
+	TIMES  shift 37
+	DIV  shift 38
+	MOD  shift 39
+	IN  reduce 16
+	RPAREN  reduce 16
+	EQ  reduce 16
+	LEQ  reduce 16
+	LT  reduce 16
+	GEQ  reduce 16
+	GT  reduce 16
+	THEN  reduce 16
+	ELSE  reduce 16
+	EOF  reduce 16
+
+
+state 18
+	infix_exp : and_exp .  (17)
+	and_exp : and_exp . AND app_exp  (30)
+
+	AND  shift 40
+	IN  reduce 17
+	RPAREN  reduce 17
+	EQ  reduce 17
+	LEQ  reduce 17
+	LT  reduce 17
+	GEQ  reduce 17
+	GT  reduce 17
+	THEN  reduce 17
+	ELSE  reduce 17
+	EOF  reduce 17
+
+
+state 19
+	infix_exp : or_exp .  (18)
+	or_exp : or_exp . OR app_exp  (32)
+
+	OR  shift 41
+	IN  reduce 18
+	RPAREN  reduce 18
+	EQ  reduce 18
+	LEQ  reduce 18
+	LT  reduce 18
+	GEQ  reduce 18
+	GT  reduce 18
+	THEN  reduce 18
+	ELSE  reduce 18
+	EOF  reduce 18
+
+
+state 20
+	infix_exp : app_exp .  (19)
+	plus_minus_exp : app_exp . PLUS app_exp  (22)
+	plus_minus_exp : app_exp . MINUS app_exp  (23)
+	times_div_mod_exp : app_exp . TIMES app_exp  (27)
+	times_div_mod_exp : app_exp . DIV app_exp  (28)
+	times_div_mod_exp : app_exp . MOD app_exp  (29)
+	and_exp : app_exp . AND app_exp  (31)
+	or_exp : app_exp . OR app_exp  (33)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	AND  shift 42
+	OR  shift 43
+	NOT  shift 9
+	PLUS  shift 44
+	MINUS  shift 45
+	TIMES  shift 46
+	DIV  shift 47
+	MOD  shift 48
+	NUM  shift 11
+	IN  reduce 19
+	RPAREN  reduce 19
+	EQ  reduce 19
+	LEQ  reduce 19
+	LT  reduce 19
+	GEQ  reduce 19
+	GT  reduce 19
+	THEN  reduce 19
+	ELSE  reduce 19
+	EOF  reduce 19
+
+	atomic_exp  goto 49
+
+
+state 21
+	app_exp : atomic_exp .  (35)
+
+	.  reduce 35
+
+
+state 22
+	var_list : VAR .  (7)
+	var_list : VAR . var_list  (8)
+
+	VAR  shift 22
+	IMP  reduce 7
+	EQ  reduce 7
+
+	var_list  goto 50
+
+
+state 23
+	exp : FUN var_list . IMP exp  (2)
+
+	IMP  shift 51
+	.  error
+
+
+state 24
+	exp : LET REC . var_list EQ exp IN exp  (5)
+
+	VAR  shift 22
+	.  error
+
+	var_list  goto 52
+
+
+state 25
+	exp : LET var_list . EQ exp IN exp  (4)
+
+	EQ  shift 53
+	.  error
+
+
+state 26
+	atomic_exp : LPAREN exp . RPAREN  (41)
+
+	RPAREN  shift 54
+	.  error
+
+
+state 27
+	atomic_exp : NOT atomic_exp .  (40)
+
+	.  reduce 40
+
+
+state 28
+	exp : IF exp . THEN exp ELSE exp  (3)
+
+	THEN  shift 55
+	.  error
+
+
+state 29
+	main : exp EOF .  (1)
+
+	.  reduce 1
+
+
+state 30
+	compare_exp : infix_exp EQ . infix_exp  (9)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	infix_exp  goto 56
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 31
+	compare_exp : infix_exp LEQ . infix_exp  (10)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	infix_exp  goto 57
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 32
+	compare_exp : infix_exp LT . infix_exp  (11)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	infix_exp  goto 58
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 33
+	compare_exp : infix_exp GEQ . infix_exp  (12)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	infix_exp  goto 59
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 34
+	compare_exp : infix_exp GT . infix_exp  (13)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	infix_exp  goto 60
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 35
+	plus_minus_exp : plus_minus_exp PLUS . app_exp  (20)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 61
+	atomic_exp  goto 21
+
+
+state 36
+	plus_minus_exp : plus_minus_exp MINUS . app_exp  (21)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 62
+	atomic_exp  goto 21
+
+
+state 37
+	times_div_mod_exp : times_div_mod_exp TIMES . app_exp  (24)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 63
+	atomic_exp  goto 21
+
+
+state 38
+	times_div_mod_exp : times_div_mod_exp DIV . app_exp  (25)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 64
+	atomic_exp  goto 21
+
+
+state 39
+	times_div_mod_exp : times_div_mod_exp MOD . app_exp  (26)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 65
+	atomic_exp  goto 21
+
+
+state 40
+	and_exp : and_exp AND . app_exp  (30)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 66
+	atomic_exp  goto 21
+
+
+state 41
+	or_exp : or_exp OR . app_exp  (32)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 67
+	atomic_exp  goto 21
+
+
+state 42
+	and_exp : app_exp AND . app_exp  (31)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 68
+	atomic_exp  goto 21
+
+
+state 43
+	or_exp : app_exp OR . app_exp  (33)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 69
+	atomic_exp  goto 21
+
+
+state 44
+	plus_minus_exp : app_exp PLUS . app_exp  (22)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 70
+	atomic_exp  goto 21
+
+
+state 45
+	plus_minus_exp : app_exp MINUS . app_exp  (23)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 71
+	atomic_exp  goto 21
+
+
+state 46
+	times_div_mod_exp : app_exp TIMES . app_exp  (27)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 72
+	atomic_exp  goto 21
+
+
+state 47
+	times_div_mod_exp : app_exp DIV . app_exp  (28)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 73
+	atomic_exp  goto 21
+
+
+state 48
+	times_div_mod_exp : app_exp MOD . app_exp  (29)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	.  error
+
+	app_exp  goto 74
+	atomic_exp  goto 21
+
+
+state 49
+	app_exp : app_exp atomic_exp .  (34)
+
+	.  reduce 34
+
+
+state 50
+	var_list : VAR var_list .  (8)
+
+	.  reduce 8
+
+
+state 51
+	exp : FUN var_list IMP . exp  (2)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 75
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 52
+	exp : LET REC var_list . EQ exp IN exp  (5)
+
+	EQ  shift 76
+	.  error
+
+
+state 53
+	exp : LET var_list EQ . exp IN exp  (4)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 77
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 54
+	atomic_exp : LPAREN exp RPAREN .  (41)
+
+	.  reduce 41
+
+
+state 55
+	exp : IF exp THEN . exp ELSE exp  (3)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 78
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 56
+	compare_exp : infix_exp EQ infix_exp .  (9)
+
+	.  reduce 9
+
+
+state 57
+	compare_exp : infix_exp LEQ infix_exp .  (10)
+
+	.  reduce 10
+
+
+state 58
+	compare_exp : infix_exp LT infix_exp .  (11)
+
+	.  reduce 11
+
+
+state 59
+	compare_exp : infix_exp GEQ infix_exp .  (12)
+
+	.  reduce 12
+
+
+state 60
+	compare_exp : infix_exp GT infix_exp .  (13)
+
+	.  reduce 13
+
+
+state 61
+	plus_minus_exp : plus_minus_exp PLUS app_exp .  (20)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 20
+	RPAREN  reduce 20
+	PLUS  reduce 20
+	MINUS  reduce 20
+	EQ  reduce 20
+	LEQ  reduce 20
+	LT  reduce 20
+	GEQ  reduce 20
+	GT  reduce 20
+	THEN  reduce 20
+	ELSE  reduce 20
+	EOF  reduce 20
+
+	atomic_exp  goto 49
+
+
+state 62
+	plus_minus_exp : plus_minus_exp MINUS app_exp .  (21)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 21
+	RPAREN  reduce 21
+	PLUS  reduce 21
+	MINUS  reduce 21
+	EQ  reduce 21
+	LEQ  reduce 21
+	LT  reduce 21
+	GEQ  reduce 21
+	GT  reduce 21
+	THEN  reduce 21
+	ELSE  reduce 21
+	EOF  reduce 21
+
+	atomic_exp  goto 49
+
+
+state 63
+	times_div_mod_exp : times_div_mod_exp TIMES app_exp .  (24)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 24
+	RPAREN  reduce 24
+	TIMES  reduce 24
+	DIV  reduce 24
+	MOD  reduce 24
+	EQ  reduce 24
+	LEQ  reduce 24
+	LT  reduce 24
+	GEQ  reduce 24
+	GT  reduce 24
+	THEN  reduce 24
+	ELSE  reduce 24
+	EOF  reduce 24
+
+	atomic_exp  goto 49
+
+
+state 64
+	times_div_mod_exp : times_div_mod_exp DIV app_exp .  (25)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 25
+	RPAREN  reduce 25
+	TIMES  reduce 25
+	DIV  reduce 25
+	MOD  reduce 25
+	EQ  reduce 25
+	LEQ  reduce 25
+	LT  reduce 25
+	GEQ  reduce 25
+	GT  reduce 25
+	THEN  reduce 25
+	ELSE  reduce 25
+	EOF  reduce 25
+
+	atomic_exp  goto 49
+
+
+state 65
+	times_div_mod_exp : times_div_mod_exp MOD app_exp .  (26)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 26
+	RPAREN  reduce 26
+	TIMES  reduce 26
+	DIV  reduce 26
+	MOD  reduce 26
+	EQ  reduce 26
+	LEQ  reduce 26
+	LT  reduce 26
+	GEQ  reduce 26
+	GT  reduce 26
+	THEN  reduce 26
+	ELSE  reduce 26
+	EOF  reduce 26
+
+	atomic_exp  goto 49
+
+
+state 66
+	and_exp : and_exp AND app_exp .  (30)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 30
+	RPAREN  reduce 30
+	AND  reduce 30
+	EQ  reduce 30
+	LEQ  reduce 30
+	LT  reduce 30
+	GEQ  reduce 30
+	GT  reduce 30
+	THEN  reduce 30
+	ELSE  reduce 30
+	EOF  reduce 30
+
+	atomic_exp  goto 49
+
+
+state 67
+	or_exp : or_exp OR app_exp .  (32)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 32
+	RPAREN  reduce 32
+	OR  reduce 32
+	EQ  reduce 32
+	LEQ  reduce 32
+	LT  reduce 32
+	GEQ  reduce 32
+	GT  reduce 32
+	THEN  reduce 32
+	ELSE  reduce 32
+	EOF  reduce 32
+
+	atomic_exp  goto 49
+
+
+state 68
+	and_exp : app_exp AND app_exp .  (31)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 31
+	RPAREN  reduce 31
+	AND  reduce 31
+	EQ  reduce 31
+	LEQ  reduce 31
+	LT  reduce 31
+	GEQ  reduce 31
+	GT  reduce 31
+	THEN  reduce 31
+	ELSE  reduce 31
+	EOF  reduce 31
+
+	atomic_exp  goto 49
+
+
+state 69
+	or_exp : app_exp OR app_exp .  (33)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 33
+	RPAREN  reduce 33
+	OR  reduce 33
+	EQ  reduce 33
+	LEQ  reduce 33
+	LT  reduce 33
+	GEQ  reduce 33
+	GT  reduce 33
+	THEN  reduce 33
+	ELSE  reduce 33
+	EOF  reduce 33
+
+	atomic_exp  goto 49
+
+
+state 70
+	plus_minus_exp : app_exp PLUS app_exp .  (22)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 22
+	RPAREN  reduce 22
+	PLUS  reduce 22
+	MINUS  reduce 22
+	EQ  reduce 22
+	LEQ  reduce 22
+	LT  reduce 22
+	GEQ  reduce 22
+	GT  reduce 22
+	THEN  reduce 22
+	ELSE  reduce 22
+	EOF  reduce 22
+
+	atomic_exp  goto 49
+
+
+state 71
+	plus_minus_exp : app_exp MINUS app_exp .  (23)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 23
+	RPAREN  reduce 23
+	PLUS  reduce 23
+	MINUS  reduce 23
+	EQ  reduce 23
+	LEQ  reduce 23
+	LT  reduce 23
+	GEQ  reduce 23
+	GT  reduce 23
+	THEN  reduce 23
+	ELSE  reduce 23
+	EOF  reduce 23
+
+	atomic_exp  goto 49
+
+
+state 72
+	times_div_mod_exp : app_exp TIMES app_exp .  (27)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 27
+	RPAREN  reduce 27
+	TIMES  reduce 27
+	DIV  reduce 27
+	MOD  reduce 27
+	EQ  reduce 27
+	LEQ  reduce 27
+	LT  reduce 27
+	GEQ  reduce 27
+	GT  reduce 27
+	THEN  reduce 27
+	ELSE  reduce 27
+	EOF  reduce 27
+
+	atomic_exp  goto 49
+
+
+state 73
+	times_div_mod_exp : app_exp DIV app_exp .  (28)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 28
+	RPAREN  reduce 28
+	TIMES  reduce 28
+	DIV  reduce 28
+	MOD  reduce 28
+	EQ  reduce 28
+	LEQ  reduce 28
+	LT  reduce 28
+	GEQ  reduce 28
+	GT  reduce 28
+	THEN  reduce 28
+	ELSE  reduce 28
+	EOF  reduce 28
+
+	atomic_exp  goto 49
+
+
+state 74
+	times_div_mod_exp : app_exp MOD app_exp .  (29)
+	app_exp : app_exp . atomic_exp  (34)
+
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	NUM  shift 11
+	IN  reduce 29
+	RPAREN  reduce 29
+	TIMES  reduce 29
+	DIV  reduce 29
+	MOD  reduce 29
+	EQ  reduce 29
+	LEQ  reduce 29
+	LT  reduce 29
+	GEQ  reduce 29
+	GT  reduce 29
+	THEN  reduce 29
+	ELSE  reduce 29
+	EOF  reduce 29
+
+	atomic_exp  goto 49
+
+
+state 75
+	exp : FUN var_list IMP exp .  (2)
+
+	.  reduce 2
+
+
+state 76
+	exp : LET REC var_list EQ . exp IN exp  (5)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 79
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 77
+	exp : LET var_list EQ exp . IN exp  (4)
+
+	IN  shift 80
+	.  error
+
+
+state 78
+	exp : IF exp THEN exp . ELSE exp  (3)
+
+	ELSE  shift 81
+	.  error
+
+
+state 79
+	exp : LET REC var_list EQ exp . IN exp  (5)
+
+	IN  shift 82
+	.  error
+
+
+state 80
+	exp : LET var_list EQ exp IN . exp  (4)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 83
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 81
+	exp : IF exp THEN exp ELSE . exp  (3)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 84
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 82
+	exp : LET REC var_list EQ exp IN . exp  (5)
+
+	FUN  shift 3
+	LET  shift 4
+	VAR  shift 5
+	LPAREN  shift 6
+	TRUE  shift 7
+	FALSE  shift 8
+	NOT  shift 9
+	IF  shift 10
+	NUM  shift 11
+	.  error
+
+	exp  goto 85
+	compare_exp  goto 14
+	infix_exp  goto 15
+	plus_minus_exp  goto 16
+	times_div_mod_exp  goto 17
+	and_exp  goto 18
+	or_exp  goto 19
+	app_exp  goto 20
+	atomic_exp  goto 21
+
+
+state 83
+	exp : LET var_list EQ exp IN exp .  (4)
+
+	.  reduce 4
+
+
+state 84
+	exp : IF exp THEN exp ELSE exp .  (3)
+
+	.  reduce 3
+
+
+state 85
+	exp : LET REC var_list EQ exp IN exp .  (5)
+
+	.  reduce 5
+
+
+32 terminals, 13 nonterminals
+43 grammar rules, 86 states
